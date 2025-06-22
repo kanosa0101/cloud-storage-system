@@ -15,6 +15,7 @@ public:
     ~OpeDB();
 
     bool handleRegist(const char* name, const char* pwd);
+    bool handleLogin(const char* name, const char* pwd);
 
 signals:
 
