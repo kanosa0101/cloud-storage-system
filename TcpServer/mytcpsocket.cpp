@@ -5,6 +5,12 @@
 
 MyTcpSocket::MyTcpSocket() {
     connect(this, SIGNAL(readyRead()), this, SLOT(recvMsg()));
+    connect(this, SIGNAL(disconnected()), this, SLOT(clientOffline()));
+}
+
+QString MyTcpSocket::getName()
+{
+    return m_strName;
 }
 
 void MyTcpSocket::recvMsg()
@@ -44,6 +50,7 @@ void MyTcpSocket::recvMsg()
         respdu->uiMsgType = ENUM_MSG_TYPE_LOGIN_RESPOND;
         if(ret){
             strcpy(respdu->caData, LOGIN_OK);
+            m_strName = caName;
         }else{
             strcpy(respdu->caData, LOGIN_FAILED);
         }
@@ -58,4 +65,10 @@ void MyTcpSocket::recvMsg()
 
     free(pdu);
     pdu = nullptr;
+}
+
+void MyTcpSocket::clientOffline()
+{
+    OpeDB::getinstance().handleOffline(m_strName.toStdString().c_str()); // 从 QString 转换为 const char*
+    emit offline(this);
 }
