@@ -23,6 +23,9 @@ public:
 
     void loadConfig();
 
+    static TcpClient& getinstance(); // 使用单例模式方便不同模块访问同一个TCP连接
+    QTcpSocket& getTcpSocket();
+
 public slots:
     void showConnect();
     void recvMsg();

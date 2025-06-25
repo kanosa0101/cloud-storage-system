@@ -53,6 +53,17 @@ void TcpClient::loadConfig(){
     }
 }
 
+TcpClient &TcpClient::getinstance()
+{
+    static TcpClient instance;
+    return instance;
+}
+
+QTcpSocket &TcpClient::getTcpSocket()
+{
+    return m_tcpSocket;
+}
+
 void TcpClient::showConnect(){
     QMessageBox::information(this, "连接服务器", "连接服务器成功");
 }
@@ -83,6 +94,20 @@ void TcpClient::recvMsg()
         }
         else if(strcmp(pdu->caData, LOGIN_FAILED) == 0){
             QMessageBox::warning(this, "登录", LOGIN_FAILED);
+        }
+        break;
+    }
+    case ENUM_MSG_TYPE_ALL_ONLLINE_RESPOND:{
+        OpeWidget::getInstance().getFriend()->showAllOnlineUsr(pdu);
+        break;
+    }
+    case ENUM_MSG_TYPE_SEARCH_USR_RESPOND:{
+        if(strcmp(SEARCH_USR_NO, pdu->caData) == 0){
+            QMessageBox::information(this, "搜索", QString("%1: not exist:").arg(OpeWidget::getInstance().getFriend()->m_strSearchName));
+        }else if (strcmp(SEARCH_USR_ONLINE, pdu->caData) == 0){
+            QMessageBox::information(this, "搜索", QString("%1: online").arg(OpeWidget::getInstance().getFriend()->m_strSearchName));
+        }else if(strcmp(SEARCH_USR_OFFLINE, pdu->caData) == 0){
+            QMessageBox::information(this, "搜索", QString("%1: offline").arg(OpeWidget::getInstance().getFriend()->m_strSearchName));
         }
         break;
     }

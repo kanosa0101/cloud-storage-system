@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
+#include <QStringList>
 
 class OpeDB : public QObject
 {
@@ -17,6 +18,8 @@ public:
     bool handleRegist(const char* name, const char* pwd);
     bool handleLogin(const char* name, const char* pwd);
     void handleOffline(const char* name);
+    QStringList handleAllOnline();
+    int handleSearchUsr(const char* name);
 
 signals:
 

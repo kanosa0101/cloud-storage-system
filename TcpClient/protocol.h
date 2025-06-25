@@ -12,12 +12,20 @@ typedef unsigned int uint;
 #define LOGIN_OK "login ok"
 #define LOGIN_FAILED "login failed : name or pwd error or relogin"
 
+#define SEARCH_USR_NO "no such people"
+#define SEARCH_USR_ONLINE "online"
+#define SEARCH_USR_OFFLINE "offline"
+
 enum ENUM_MSG_TYPE{
     ENUM_MSG_TYPE_MIN = 0,
     ENUM_MSG_TYPE_REGIST_REQUEST, // 注册请求
     ENUM_MSG_TYPE_REGIST_RESPOND, // 注册回复
     ENUM_MSG_TYPE_LOGIN_REQUEST, // 登录请求
     ENUM_MSG_TYPE_LOGIN_RESPOND, // 登录回复
+    ENUM_MSG_TYPE_ALL_ONLLINE_REQUEST, // 在线用户请求
+    ENUM_MSG_TYPE_ALL_ONLLINE_RESPOND, // 在线用户回复
+    ENUM_MSG_TYPE_SEARCH_USR_REQUEST, // 搜索用户请求
+    ENUM_MSG_TYPE_SEARCH_USR_RESPOND, // 搜索用户回复
     ENUM_MSG_TYPE_MAX = 0x00ffffff
 };
 

@@ -38,7 +38,7 @@ OpeDB::~OpeDB()
 
 bool OpeDB::handleRegist(const char *name, const char *pwd)
 {
-    if(name == NULL || pwd == NULL){
+    if(name == nullptr || pwd == nullptr){
         qDebug() << "name | pwd is NULL";
         return false;
     }
@@ -49,7 +49,7 @@ bool OpeDB::handleRegist(const char *name, const char *pwd)
 
 bool OpeDB::handleLogin(const char *name, const char *pwd)
 {
-    if(name == NULL || pwd == NULL){
+    if(name == nullptr || pwd == nullptr){
         qDebug() << "name | pwd is NULL";
         return false;
     }
@@ -70,11 +70,43 @@ bool OpeDB::handleLogin(const char *name, const char *pwd)
 
 void OpeDB::handleOffline(const char *name)
 {
-    if(name == NULL){
+    if(name == nullptr){
         qDebug() << "name is NULL";
         return;
     }
     QString data = QString("update usrInfo set online = 0 where name = \'%1\'").arg(name);
     QSqlQuery query;
     query.exec(data);
+}
+
+QStringList OpeDB::handleAllOnline()
+{
+    QString data = QString("select name from usrInfo where online = 1");
+    QSqlQuery query;
+    query.exec(data);
+
+    QStringList result;
+    result.clear();
+
+    while(query.next()){
+        result.append(query.value(0).toString());
+    }
+
+    return result;
+}
+
+int OpeDB::handleSearchUsr(const char *name)
+{
+    if(name == nullptr){
+        return -1;
+    }
+    QString data = QString("select online from usrInfo where name = \'%1\'").arg(name);
+    QSqlQuery query;
+    query.exec(data);
+    if(query.next()){
+        int ret = query.value(0).toInt();
+        return ret;
+    }else{
+        return -1;
+    }
 }
