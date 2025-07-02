@@ -4,6 +4,7 @@
 #include <QTcpServer>
 #include <QList>
 #include "mytcpsocket.h"
+#include <protocol.h>
 
 class MyTcpServer : public QTcpServer
 {
@@ -15,6 +16,8 @@ public:
     static MyTcpServer& getInstance();
 
     virtual void incomingConnection(qintptr socketDescriptor) override;
+
+    void resend(const char* pername, PDU* pdu);
 
 public slots:
     void deleteSocket(MyTcpSocket *mysocket);

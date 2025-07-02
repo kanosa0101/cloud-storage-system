@@ -18,6 +18,20 @@ void MyTcpServer::incomingConnection(qintptr socketDescriptor)
     connect(pTcpSocket, SIGNAL(offline(MyTcpSocket*)), this, SLOT(deleteSocket(MyTcpSocket*)));
 }
 
+void MyTcpServer::resend(const char *pername, PDU *pdu)
+{
+    if(pername == nullptr || pdu == nullptr){
+        return;
+    }
+    QString strName = pername;
+    for(int i = 0; i < m_tcpSocketList.size(); i++){
+        if(m_tcpSocketList.at(i)->getName() == strName){
+            m_tcpSocketList.at(i)->write((char*)pdu, pdu->uiPDULen);
+            break;
+        }
+    }
+}
+
 void MyTcpServer::deleteSocket(MyTcpSocket *mysocket)
 {
     QList<MyTcpSocket*>::Iterator iter = m_tcpSocketList.begin();

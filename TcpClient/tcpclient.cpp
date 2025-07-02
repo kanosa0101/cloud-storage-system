@@ -64,6 +64,11 @@ QTcpSocket &TcpClient::getTcpSocket()
     return m_tcpSocket;
 }
 
+QString TcpClient::loginName()
+{
+    return m_strLoginName;
+}
+
 void TcpClient::showConnect(){
     QMessageBox::information(this, "连接服务器", "连接服务器成功");
 }
@@ -111,6 +116,34 @@ void TcpClient::recvMsg()
         }
         break;
     }
+    case ENUM_MSG_TYPE_ADD_FRIEND_REQUEST:{
+        char caName[32] = {'\0'};
+        strncpy(caName, pdu->caData + 32, 32);
+        int ret = QMessageBox::information(this, "添加好友", QString("%1 want to add you as friend ?").arg(caName), QMessageBox::Yes, QMessageBox::No);
+        PDU* respdu = mkPDU(0);
+        memcpy(respdu->caData, pdu->caData, 64); //strcpy复制到\0，memcpy负责指定长度内存块
+        if(ret == QMessageBox::Yes){
+            respdu->uiMsgType = ENUM_MSG_TYPE_ADD_FRIEND_AGREE;
+        }else{
+            respdu->uiMsgType = ENUM_MSG_TYPE_ADD_FRIEND_REFUSE;
+        }
+        m_tcpSocket.write((char*)respdu, respdu->uiPDULen);
+        free(respdu);
+        respdu = nullptr;
+        break;
+    }
+    case ENUM_MSG_TYPE_ADD_FRIEND_RESPOND:{
+        QMessageBox::information(this, "添加好友", pdu->caData);
+        break;
+    }
+    case ENUM_MSG_TYPE_ADD_FRIEND_AGREE:{
+        QMessageBox::information(this, "添加好友", QString("%1 已同意您的好友申请！").arg(pdu->caData));
+        break;
+    }
+    case ENUM_MSG_TYPE_ADD_FRIEND_REFUSE:{
+        QMessageBox::information(this, "添加好友", QString("%1 已拒绝您的好友申请！").arg(pdu->caData));
+        break;
+    }
     default:
         break;
     }
@@ -119,31 +152,15 @@ void TcpClient::recvMsg()
     pdu = nullptr;
 }
 
-// void TcpClient::on_pushButton_clicked()
-// {
-//     QString strMsg = ui->name_le->text();
-//     if(!strMsg.isEmpty()){
-//         PDU* pdu = mkPDU(strMsg.size() + 1);
-//         pdu->uiMsgType = 8888;
-//         memcpy(pdu->caMsg, strMsg.toStdString().c_str(), strMsg.size());
-//         qDebug() << (char*)(pdu->caMsg);
-//         m_tcpSocket.write((char*)pdu, pdu->uiPDULen);
-//         free(pdu);
-//         pdu = nullptr;
-//     }else{
-//         QMessageBox::warning(this, "信息发送", "发送的信息不能为空");
-//     }
-// }
-
 
 void TcpClient::on_login_pb_clicked()
 {
-    QString strName = ui->name_le->text();
+    m_strLoginName = ui->name_le->text();
     QString strPwd = ui->pwd_le->text();
-    if(!strName.isEmpty() && !strPwd.isEmpty()){
+    if(!m_strLoginName.isEmpty() && !strPwd.isEmpty()){
         PDU* pdu = mkPDU(0);
         pdu->uiMsgType = ENUM_MSG_TYPE_LOGIN_REQUEST;
-        strncpy(pdu->caData, strName.toStdString().c_str(), 32);
+        strncpy(pdu->caData, m_strLoginName.toStdString().c_str(), 32);
         strncpy(pdu->caData + 32, strPwd.toStdString().c_str(), 32);
         m_tcpSocket.write((char*)pdu, pdu->uiPDULen);
         free(pdu);

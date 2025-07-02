@@ -25,6 +25,7 @@ public:
 
     static TcpClient& getinstance(); // 使用单例模式方便不同模块访问同一个TCP连接
     QTcpSocket& getTcpSocket();
+    QString loginName();
 
 public slots:
     void showConnect();
@@ -46,5 +47,6 @@ private:
 
     //连接服务器，和服务器数据交互
     QTcpSocket m_tcpSocket;
+    QString m_strLoginName;
 };
 #endif // TCPCLIENT_H

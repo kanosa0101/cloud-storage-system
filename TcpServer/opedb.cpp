@@ -110,3 +110,65 @@ int OpeDB::handleSearchUsr(const char *name)
         return -1;
     }
 }
+
+int OpeDB::handleAddFriend(const char *pername, const char *name)
+{
+    if(pername == nullptr || name == nullptr){
+        return -1;
+    }
+    QString data = QString(
+        "SELECT * FROM friend WHERE "
+        "(id = (SELECT id FROM usrInfo WHERE name = '%1') AND friendId = (SELECT id FROM usrInfo WHERE name = '%2')) "
+        "OR "
+        "(id = (SELECT id FROM usrInfo WHERE name = '%3') AND friendId = (SELECT id FROM usrInfo WHERE name = '%4'))"
+        ).arg(pername, name, name, pername);
+    qDebug() << data;
+    QSqlQuery query;
+    query.exec(data);
+    if(query.next()){
+        return 0; // 双方已经是好友
+    }
+    data = QString("select online from usrInfo where name = \'%1\'").arg(pername);
+    query.exec(data);
+    if(query.next()){
+        int ret = query.value(0).toInt();
+        if(ret == 1){
+            return 1; // 在线
+        }
+        else if(ret == 0){
+            return 2; // 不在线
+        }
+    }
+    return 3; // 用户不存在
+}
+
+void OpeDB::handleAddFriendAgree(const char *addedName, const char *sourceName)
+{
+    if(addedName == nullptr || sourceName == nullptr){
+        return;
+    }
+    int sourceUserId = getIdByUserName(sourceName);
+    int addedUserId = getIdByUserName(addedName);
+    qDebug() << sourceUserId << " " << addedUserId;
+    QString strQuery = QString("insert into friend values(%1, %2) ").arg(sourceUserId).arg(addedUserId);
+    QSqlQuery query;
+    query.exec(strQuery);
+}
+
+int OpeDB::getIdByUserName(const char *name)
+{
+    if(name == nullptr){
+        return -1; // 不存在
+    }
+    QString data = QString("select id from usrInfo where name=\'%1\'").arg(name);
+    QSqlQuery query;
+    query.exec(data);
+    qDebug() << data;
+    if(query.next()){
+        return query.value(0).toInt();
+    }
+    else{
+        qDebug() << "error";
+        return -1;
+    }
+}
